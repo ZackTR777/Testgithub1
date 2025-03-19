@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Logger</title>
+    <script>
+        // Function to detect the device type
+        function detectDevice() {
+            const userAgent = navigator.userAgent;
+            let deviceType = "Unknown";
+
+            if (/Android/.test(userAgent)) {
+                deviceType = "Android";
+            } else if (/iPhone|iPad|iPod/.test(userAgent)) {
+                deviceType = "iOS";
+            } else if (/Windows Phone/.test(userAgent)) {
+                deviceType = "Windows Phone";
+            } else if (/Macintosh/.test(userAgent)) {
+                deviceType = "Mac";
+            } else if (/Windows/.test(userAgent)) {
+                deviceType = "Windows PC";
+            } else if (/Linux/.test(userAgent)) {
+                deviceType = "Linux PC";
+            }
+
+            return deviceType;
+        }
+
+        // Function to log the device info
+        async function logDeviceInfo() {
+            const deviceType = detectDevice();
+            const timestamp = new Date().toISOString();
+
+            // Log the device info to a file (using GitHub API)
+            const logEntry = `Device Type: ${deviceType} | Timestamp: ${timestamp}\n`;
+
+            // Save the log entry to a file in the GitHub repository
+            const response = await fetch("https://api.github.com/repos/your-username/device-logger/contents/logs.txt", {
+                method: "PUT",
+                headers: {
+                    "Authorization": "Bearer YOUR_GITHUB_TOKEN",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    message: "Log device info",
+                    content: btoa(logEntry), // Encode the log entry in base64
+                    sha: "", // Leave empty for a new file
+                }),
+            });
+
+            if (response.ok) {
+                console.log("Device info logged successfully!");
+            } else {
+                console.error("Failed to log device info.");
+            }
+        }
+
+        // Run the function when the page loads
+        window.onload = logDeviceInfo;
+    </script>
+</head>
+<body>
+    <h1>Device Logger</h1>
+    <p>Your device type is being detected and logged.</p>
+</body>
+</html>
